@@ -1,9 +1,10 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import InfinitePaged from './InfinitePaged';
 import ListItem from './ListItem';
 
-const items = Array.apply(null, Array(1000)).map((item, i) => i);
+const items = Array.apply(null, Array(1000)).map((item, i) => ({ content: i}));
 console.log('items', items);
 
 const App = () =>  (
@@ -13,9 +14,10 @@ const App = () =>  (
       <h2>Welcome to React</h2>
     </div>
     <div className="App-list">
-      {
-        items.map(num => <ListItem>{num}</ListItem>)
-      }
+      <InfinitePaged
+        items={items}
+        Component={ListItem}
+      />
     </div>
   </div>
 );

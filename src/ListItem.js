@@ -2,10 +2,12 @@ import React from 'react';
 
 import './ListItem.css';
 
-const ListItem = ({children}) => (
-  <div className="list-item">
-    {children}
-  </div>
-);
+const ListItem = ({content}) => {
+  return (
+    <div className="list-item">
+      {content}
+    </div>
+  );
+}
 
 export default ListItem;
