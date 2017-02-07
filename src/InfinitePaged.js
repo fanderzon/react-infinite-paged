@@ -34,11 +34,10 @@ class InfiniteContent extends Component {
   }
 
   render() {
-    console.log('InfiniteContent', this.props.displayStart, this.props.displayEnd);
     const before = <div style={{height: this.props.displayStart * this.props.itemHeight}}></div>;
     const after = <div style={{height: (this.props.items.length - this.props.displayEnd) * this.props.itemHeight}}></div>;
     const visible = [];
-    for (var i = this.props.displayStart; i < this.props.displayEnd; ++i) {
+    for (var i = this.props.displayStart; i <= this.props.displayEnd; ++i) {
       var item = this.props.items[i];
       visible.push(<this.props.Component key={i} {...item} />);
     }
@@ -81,15 +80,17 @@ class InfinitePaged extends Component {
   }
 
   defaultState(props) {
-    const itemsPerBody = Math.floor((props.height - 2) / props.itemHeight);
+    const height = window.innerHeight;
+    const itemsPerBody = Math.floor((height - 2) / props.itemHeight);
 
     return {
       total: props.items.length,
       items: props.items,
       itemHeight: props.itemHeight,
+      height,
       itemsPerBody,
       visibleStart: 0,
-      visibleEnd: itemsPerBody,
+      visibleEnd: itemsPerBody - 1,
       displayStart: 0,
       displayEnd: itemsPerBody * 2
     };
@@ -101,9 +102,17 @@ class InfinitePaged extends Component {
   }
 
   scrollState(scroll) {
-    scroll += this.container.offsetTop;
+    const offset = this.container.offsetTop;
+    let itemsPerBody = this.state.itemsPerBody;
+    if (scroll < offset) {
+      scroll = 0;
+      itemsPerBody -= Math.floor(offset / this.state.itemHeight);
+    } else {
+      scroll -= offset;
+    }
+
     var visibleStart = Math.floor(scroll / this.state.itemHeight);
-    var visibleEnd = Math.min(visibleStart + this.state.itemsPerBody, this.state.total - 1);
+    var visibleEnd = Math.min(visibleStart + (this.state.itemsPerBody - 1), this.state.total - 1);
 
     var displayStart = Math.max(0, Math.floor(scroll / this.state.itemHeight) - this.state.itemsPerBody * 1.5);
     var displayEnd = Math.min(displayStart + 4 * this.state.itemsPerBody, this.state.total - 1);
