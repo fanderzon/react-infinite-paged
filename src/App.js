@@ -17,9 +17,11 @@ const App = () =>  (
       <InfinitePaged
         items={items}
         itemHeight={160}
+        height={400}
         Component={ListItem}
         displayStart={100}
         displayEnd={150}
+        trackElement={document.body}
       />
     </div>
   </div>
