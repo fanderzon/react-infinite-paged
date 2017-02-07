@@ -34,6 +34,7 @@ class InfiniteContent extends Component {
   }
 
   render() {
+    console.log('InfiniteContent', this.props.displayStart, this.props.displayEnd);
     const before = <div style={{height: this.props.displayStart * this.props.itemHeight}}></div>;
     const after = <div style={{height: (this.props.items.length - this.props.displayEnd) * this.props.itemHeight}}></div>;
     const visible = [];
@@ -100,6 +101,7 @@ class InfinitePaged extends Component {
   }
 
   scrollState(scroll) {
+    scroll += this.container.offsetTop;
     var visibleStart = Math.floor(scroll / this.state.itemHeight);
     var visibleEnd = Math.min(visibleStart + this.state.itemsPerBody, this.state.total - 1);
 
@@ -131,7 +133,7 @@ class InfinitePaged extends Component {
 
   render() {
     return (
-      <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue'}} ref={el => this.scrollable = el} onScroll={this.onScroll}>
+      <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue'}} ref={el => this.container = el} onScroll={this.onScroll}>
         <InfiniteContent
           items={this.state.items}
           total={this.state.items.length}
