@@ -16,7 +16,10 @@ const App = () =>  (
     <div className="App-list">
       <InfinitePaged
         items={items}
+        itemHeight={160}
         Component={ListItem}
+        displayStart={100}
+        displayEnd={150}
       />
     </div>
   </div>
