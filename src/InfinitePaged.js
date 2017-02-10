@@ -1,181 +1,41 @@
 import React, { Component, PropTypes } from 'react';
 
-class InfiniteContent extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      shouldUpdate: true,
-      total: 0,
-      displayStart: 0,
-      displayEnd: 0
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    var shouldUpdate = !(
-      nextProps.visibleStart >= this.state.displayStart &&
-      nextProps.visibleEnd <= this.state.displayEnd
-    ) || (nextProps.total !== this.state.total);
-
-    if (shouldUpdate) {
-      this.setState({
-        shouldUpdate: shouldUpdate,
-        total: nextProps.total,
-        displayStart: nextProps.displayStart,
-        displayEnd: nextProps.displayEnd
-      });
-    } else {
-      this.setState({shouldUpdate: false});
-    }
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.shouldUpdate;
-  }
-
-  render() {
-    const before = <div style={{height: this.props.displayStart * this.props.itemHeight}}></div>;
-    const after = <div style={{height: (this.props.items.length - this.props.displayEnd) * this.props.itemHeight}}></div>;
-    const visible = [];
-    for (var i = this.props.displayStart; i <= this.props.displayEnd; ++i) {
-      var item = this.props.items[i];
-      visible.push(<this.props.Component key={i} {...item} />);
-    }
-    return (
-      <div>
-        {before}
-        {visible}
-        {after}
-      </div>
-    );
-  }
-}
-
-InfiniteContent.propTypes = {
-  items: PropTypes.array,
-  itemHeight: PropTypes.number,
-  visibleStart: PropTypes.number,
-  visibleEnd: PropTypes.number,
-  displayStart: PropTypes.number,
-  displayEnd: PropTypes.number
-};
+import InfiniteList from './InfiniteList';
 
 class InfinitePaged extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = this.defaultState(props);
-    this.scrollState = this.scrollState.bind(this);
-    this.onScroll = this.onScroll.bind(this);
-  }
+  // constructor(props) {
+  //   super(props);
+  // }
 
   componentDidMount() {
-    // Bind to the scroll event on mount
-    const el = this.props.trackElement || document;
-    document.addEventListener('scroll', this.onScroll);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('scroll', this.onScroll);
-  }
-
-  defaultState(props) {
-    const height = window.innerHeight;
-    const itemsPerBody = Math.floor((height - 2) / props.itemHeight);
-
-    return {
-      total: props.items.length,
-      items: props.items,
-      itemHeight: props.itemHeight,
-      height,
-      itemsPerBody,
-      visibleStart: 0,
-      visibleEnd: itemsPerBody - 1,
-      displayStart: 0,
-      displayEnd: itemsPerBody * 2
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.defaultState(nextProps));
-    this.scrollState(this.state.scroll);
-  }
-
-  scrollState(scroll) {
-    const offset = this.container.offsetTop;
-    let itemsPerBody = this.state.itemsPerBody;
-    if (scroll < offset) {
-      scroll = 0;
-      itemsPerBody -= Math.floor(offset / this.state.itemHeight);
-    } else {
-      scroll -= offset;
-    }
-
-    var visibleStart = Math.floor(scroll / this.state.itemHeight);
-    var visibleEnd = Math.min(visibleStart + (this.state.itemsPerBody - 1), this.state.total - 1);
-
-    var displayStart = Math.max(0, Math.floor(scroll / this.state.itemHeight) - this.state.itemsPerBody * 1.5);
-    var displayEnd = Math.min(displayStart + 4 * this.state.itemsPerBody, this.state.total - 1);
-
-    this.setState({
-        visibleStart: visibleStart,
-        visibleEnd: visibleEnd,
-        displayStart: displayStart,
-        displayEnd: displayEnd,
-        scroll: scroll
+    this.props.dispatch({
+      type: 'FETCH_PAGE',
+      payload: 1
     });
   }
 
-  onScroll(event) {
-    this.scrollState(this.props.trackElement.scrollTop);
-  }
-
-  formatNumber(number) {
-    return (''+number).split('').reverse().join('').replace(/(...)/g, '$1,').split('').reverse().join('').replace(/^,/, '');
-  }
-
-  getCount() {
-    return (1 + this.formatNumber(this.state.visibleStart)) +
-      '-' + (1 + this.formatNumber(this.state.visibleEnd)) +
-      ' of ' + this.formatNumber(this.state.total);
-  }
-
   render() {
     return (
-      <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue'}} ref={el => this.container = el} onScroll={this.onScroll}>
-        <InfiniteContent
-          items={this.state.items}
-          total={this.state.items.length}
-          visibleStart={this.state.visibleStart}
-          visibleEnd={this.state.visibleEnd}
-          displayStart={this.state.displayStart}
-          displayEnd={this.state.displayEnd}
-          itemHeight={this.state.itemHeight}
-          Component={this.props.Component}
-        />
-      </div>
+      <InfiniteList
+        items={this.props.pageItems}
+        itemHeight={this.props.itemHeight}
+        onVisibleChange={params => {
+          console.log('onVisibleChange', params);
+        }}
+        Component={this.props.Component}
+        displayStart={100}
+        displayEnd={150}
+      />
     );
   }
-}
-
-InfiniteContent.propTypes = {
-  items: PropTypes.array,
-  itemHeight: PropTypes.number,
-  height: PropTypes.number,
-  visibleStart: PropTypes.number,
-  visibleEnd: PropTypes.number,
-  displayStart: PropTypes.number,
-  displayEnd: PropTypes.number
 };
 
-const Infinite = ({items = [], Component, visibleStart, visibleEnd}) => {
-  return (
-    <div>
-    {
-      items.map((item, i) => <Component key={i} {...item} />)
-    }
-    </div>
-  );
+InfinitePaged.propTypes = {
+  pages: PropTypes.array,
+  pageItems: PropTypes.array,
+  itemHeight: PropTypes.number,
+  Component: PropTypes.func,
+  currentPage: PropTypes.number,
 };
 
 export default InfinitePaged;
