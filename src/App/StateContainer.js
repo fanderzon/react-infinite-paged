@@ -5,14 +5,12 @@ const StateContainer = reducer => sideEffects => Component =>
     constructor(props) {
       super(props);
       this.state = reducer();
-      this.reducer = reducer.bind(null, this.state);
       this.dispatch = this.dispatch.bind(this);
     }
 
     dispatch(action) {
       sideEffects(this.state, this.dispatch, action);
-      const newState = this.reducer(action);
-      this.setState(newState);
+      this.setState(reducer(this.state, action));
     }
 
     render() {
