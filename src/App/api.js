@@ -1,4 +1,4 @@
-let items = Array.apply(null, Array(1000)).map((item, i) => ({ content: i}));
+let items = Array.apply(null, Array(1000)).map((item, i) => ({ id: i, content: i}));
 
 const api = {
   fetch({offset,limit}) {

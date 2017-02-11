@@ -20,7 +20,7 @@ const App = ({pages, items, dispatch}) => {
       <div className="App-list">
         <InfinitePaged
           pages={pages}
-          pageItems={items}
+          startAtPage={2}
           itemHeight={170}
           Component={ListItem}
           dispatch={dispatch}
