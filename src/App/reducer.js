@@ -9,7 +9,6 @@ function reducer(state = {pages: []}, {type, payload} = {}) {
         pages: mergeOrAdd(state.pages, { id: payload, loaded: false })
       };
     case FETCH_PAGE_RESOLVED:
-    const { page, items } = payload;
       return {
         ...state,
         pages: mergeOrAdd(state.pages, payload)

@@ -1,5 +1,6 @@
 import api from './api';
 
+/* eslint-disable default-case */
 export default function(state, dispatch, {type, payload}) {
   switch (type) {
     case 'FETCH_PAGE':
@@ -10,8 +11,5 @@ export default function(state, dispatch, {type, payload}) {
           loaded: true,
           items: res
         }}));
-      break;
-    default:
-
   }
 }
