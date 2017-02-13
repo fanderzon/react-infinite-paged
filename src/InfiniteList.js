@@ -102,7 +102,7 @@ class InfiniteList extends Component {
 
   scrollState(scroll = 0, props) {
     // scroll can be NaN?
-    scroll = scroll === scroll ? scroll : 0;
+    scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
     const offset = this.container.offsetTop;
     let itemsPerBody = this.state.itemsPerBody;
     if (scroll < offset) {
@@ -119,8 +119,9 @@ class InfiniteList extends Component {
     var displayStart = Math.max(0, Math.floor(scroll / props.itemHeight) - itemsPerBody * 1.5);
     var displayEnd = Math.min(displayStart + 4 * itemsPerBody, total - 1);
 
-    if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart || visibleEnd !== this.state.visibleEnd)) {
-      this.props.onVisibleChange({start: visibleStart, end: visibleEnd});
+    if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart)) {
+      const scrollDirection = visibleStart > this.state.visibleStart ? 'down' : 'up';
+      this.props.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
     }
 
     this.setState({
@@ -172,7 +173,9 @@ InfiniteContent.propTypes = {
   visibleStart: PropTypes.number,
   visibleEnd: PropTypes.number,
   displayStart: PropTypes.number,
-  displayEnd: PropTypes.number
+  displayEnd: PropTypes.number,
+  renderBefore: PropTypes.node,
+  renderAfter: PropTypes.node
 };
 
 export default InfiniteList;
