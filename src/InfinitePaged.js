@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 
 import InfiniteList from './InfiniteList';
+import {
+  DEFAULT_ITEMS_PER_PAGE
+} from './constants';
 
 class InfinitePaged extends Component {
   constructor(props) {
@@ -22,15 +25,21 @@ class InfinitePaged extends Component {
   }
 
   render() {
+    if (!this.props.itemHeight) {
+      console.error('itemHeight is a required prop');
+      return null;
+    }
     const sortedPages = sortPages(connectedPages(this.props.pages, this.props.startAtPage));
     const items = itemsFromPages(sortedPages);
     const firstPageId = sortedPages.length > 0 ? sortedPages[0].id : null;
     const lastPageId = sortedPages.length > 0 ? sortedPages[sortedPages.length - 1].id : null;
+    const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
 
     return (
       <InfiniteList
         items={items}
         itemHeight={this.props.itemHeight}
+        itemsStartOffset={firstPageId * itemsPerPage}
         onVisibleChange={params => {
           if (params.end >= (items.length - 1) && items.length > 0) {
             if (!sortedPages.find(i => i.id === (lastPageId + 1))) {
@@ -93,6 +102,7 @@ function itemsFromPages(pages) {
 InfinitePaged.propTypes = {
   pages: PropTypes.array,
   startAtPage: PropTypes.number,
+  itemsPerPage: PropTypes.number,
   itemHeight: PropTypes.number,
   Component: PropTypes.func
 };

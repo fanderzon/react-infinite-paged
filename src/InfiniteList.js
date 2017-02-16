@@ -7,7 +7,7 @@ class InfiniteContent extends Component {
       shouldUpdate: true,
       total: 0,
       displayStart: 0,
-      displayEnd: 0
+      displayEnd: 0,
     };
   }
 
@@ -103,23 +103,24 @@ class InfiniteList extends Component {
   scrollState(scroll = 0, props) {
     // scroll can be NaN?
     scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
-    const offset = this.container.offsetTop;
+    const listOffset = (props.itemsStartOffset || 0) * props.itemHeight;
+    const pageOffset = this.container.offsetTop;
     let itemsPerBody = this.state.itemsPerBody;
-    if (scroll < offset) {
+    if (scroll < pageOffset) {
       scroll = 0;
-      itemsPerBody -= Math.floor(offset / props.itemHeight);
+      itemsPerBody -= Math.floor(pageOffset / props.itemHeight);
     } else {
-      scroll -= offset;
+      scroll -= pageOffset;
     }
 
     const total = props.items.length;
-    var visibleStart = Math.floor(scroll / props.itemHeight);
+    var visibleStart = Math.floor((scroll - listOffset) / props.itemHeight);
     var visibleEnd = Math.min(visibleStart + (itemsPerBody - 1), total - 1);
 
-    var displayStart = Math.max(0, Math.floor(scroll / props.itemHeight) - itemsPerBody * 1.5);
+    var displayStart = Math.max(0, Math.floor((scroll - listOffset) / props.itemHeight) - itemsPerBody * 1.5);
     var displayEnd = Math.min(displayStart + 4 * itemsPerBody, total - 1);
 
-    if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart)) {
+    if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart) && visibleStart > -1) {
       const scrollDirection = visibleStart > this.state.visibleStart ? 'down' : 'up';
       this.props.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
     }
@@ -149,8 +150,10 @@ class InfiniteList extends Component {
   }
 
   render() {
+    const itemsStartOffset = this.props.itemsStartOffset || 0;
     return (
       <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue'}} ref={el => this.container = el} onScroll={this.onScroll}>
+        <div style={{width: '100%', background: 'purple', height: (itemsStartOffset * this.state.itemHeight) }}></div>
         <InfiniteContent
           items={this.props.items}
           total={this.props.items.length || 0}
@@ -169,6 +172,7 @@ class InfiniteList extends Component {
 InfiniteContent.propTypes = {
   items: PropTypes.array,
   itemHeight: PropTypes.number,
+  itemsStartOffset: PropTypes.number,
   height: PropTypes.number,
   visibleStart: PropTypes.number,
   visibleEnd: PropTypes.number,
