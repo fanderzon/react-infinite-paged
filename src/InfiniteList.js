@@ -152,7 +152,7 @@ class InfiniteList extends Component {
   render() {
     const itemsStartOffset = this.props.itemsStartOffset || 0;
     return (
-      <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue'}} ref={el => this.container = el} onScroll={this.onScroll}>
+      <div style={{top: 26, overflowX: 'hidden', overflowY: 'auto', background: 'blue', height: this.props.height}} ref={el => this.container = el} onScroll={this.onScroll}>
         <div style={{width: '100%', background: 'purple', height: (itemsStartOffset * this.state.itemHeight) }}></div>
         <InfiniteContent
           items={this.props.items}

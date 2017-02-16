@@ -38,6 +38,7 @@ class InfinitePaged extends Component {
     return (
       <InfiniteList
         items={items}
+        height={this.props.height}
         itemHeight={this.props.itemHeight}
         itemsStartOffset={firstPageId * itemsPerPage}
         onVisibleChange={params => {
