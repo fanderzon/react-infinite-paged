@@ -106,14 +106,7 @@ class InfiniteList extends Component {
     // scroll can be NaN?
     scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
     const listOffset = (props.itemsStartOffset || 0) * props.itemHeight;
-    const pageOffset = this.container.offsetTop;
     let itemsPerBody = this.state.itemsPerBody;
-    if (scroll < pageOffset) {
-      scroll = 0;
-      itemsPerBody -= Math.floor(pageOffset / props.itemHeight);
-    } else {
-      scroll -= pageOffset;
-    }
 
     const total = props.items.length;
     var visibleStart = Math.floor((scroll - listOffset) / props.itemHeight);
@@ -139,8 +132,7 @@ class InfiniteList extends Component {
   }
 
   onScroll(event) {
-    const trackElement = this.props.trackElement || document.body;
-    this.scrollState(trackElement.scrollTop, this.props);
+    this.scrollState(this.container.scrollTop, this.props);
   }
 
   formatNumber(number) {
@@ -167,6 +159,7 @@ class InfiniteList extends Component {
           displayEnd={this.state.displayEnd}
           itemHeight={this.state.itemHeight}
           Component={this.props.Component}
+          trackElement={this.container}
         />
       </div>
     );
