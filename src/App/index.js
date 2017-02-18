@@ -21,7 +21,7 @@ const App = ({pages, items, dispatch}) => {
         <InfinitePaged
           height={container ? window.innerHeight - container.offsetTop : 300}
           pages={pages}
-          startAtPage={2}
+          startAtPage={4}
           itemHeight={170}
           itemsPerPage={10}
           Component={ListItem}

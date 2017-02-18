@@ -9,7 +9,8 @@ class InfinitePaged extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: 1
+      currentPage: 1,
+      loaded: false
     };
   }
 
@@ -24,9 +25,20 @@ class InfinitePaged extends Component {
     });
   }
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.pages.findIndex(i => i.id === newProps.startAtPage && i.loaded) !== -1) {
+      this.setState({
+        loaded: true
+      });
+    }
+  }
+
   render() {
     if (!this.props.itemHeight) {
       console.error('itemHeight is a required prop');
+      return null;
+    }
+    if (!this.state.loaded) {
       return null;
     }
     const sortedPages = sortPages(connectedPages(this.props.pages, this.props.startAtPage));
@@ -34,13 +46,13 @@ class InfinitePaged extends Component {
     const firstPageId = sortedPages.length > 0 ? sortedPages[0].id : null;
     const lastPageId = sortedPages.length > 0 ? sortedPages[sortedPages.length - 1].id : null;
     const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
-
+    const displayStart = (firstPageId - 1) * itemsPerPage;
     return (
       <InfiniteList
         items={items}
         height={this.props.height}
         itemHeight={this.props.itemHeight}
-        itemsStartOffset={firstPageId * itemsPerPage}
+        itemsStartOffset={(firstPageId - 1) * itemsPerPage}
         onVisibleChange={params => {
           if (params.end >= (items.length - 1) && items.length > 0) {
             if (!sortedPages.find(i => i.id === (lastPageId + 1))) {
@@ -52,8 +64,8 @@ class InfinitePaged extends Component {
           }
         }}
         Component={this.props.Component}
-        displayStart={100}
-        displayEnd={150}
+        displayStart={displayStart}
+        displayEnd={displayStart + itemsPerPage - 1}
       />
     );
   }

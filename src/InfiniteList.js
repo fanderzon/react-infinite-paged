@@ -76,6 +76,7 @@ class InfiniteList extends Component {
     // Bind to the scroll event on mount
     const el = this.props.trackElement || document;
     el.addEventListener('scroll', this.onScroll);
+    this.container.scrollTop = this.state.displayStart * this.props.itemHeight;
   }
 
   componentWillUnmount() {
@@ -91,8 +92,9 @@ class InfiniteList extends Component {
       itemsPerBody,
       visibleStart: 0,
       visibleEnd: itemsPerBody - 1,
-      displayStart: 0,
-      displayEnd: itemsPerBody * 2
+      displayStart: props.displayStart || 0,
+      displayEnd: props.displayEnd || itemsPerBody * 2,
+      scrolled: false
     };
   }
 
@@ -125,12 +127,14 @@ class InfiniteList extends Component {
       this.props.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
     }
 
+    const scrolled = this.state.scrolled || (scroll > 0);
     this.setState({
         visibleStart: visibleStart,
         visibleEnd: visibleEnd,
         displayStart: displayStart,
         displayEnd: displayEnd,
-        scroll: scroll
+        scroll: scroll,
+        scrolled
     });
   }
 
