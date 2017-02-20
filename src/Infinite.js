@@ -6,7 +6,6 @@ import { DEFAULT_ITEMS_PER_PAGE } from './constants';
 class Infinite extends Component {
   constructor(props) {
     super(props);
-    console.log(props.height, props.itemHeight, props.height / props.itemHeight);
     this.state = {
       pages: [],
       items: [],
@@ -31,7 +30,6 @@ class Infinite extends Component {
       this.setState({
         loaded: true
       },() => {
-        window.c = this.container;
         this.container.scrollTop = newProps.itemHeight;
       });
     }
@@ -60,7 +58,7 @@ class Infinite extends Component {
     scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
     const itemsPerBody = Math.floor(this.props.height / this.props.itemHeight);
     const total = this.state.items.length;
-    var visibleStart = Math.floor((scroll - props.itemHeight) / props.itemHeight);
+    var visibleStart = Math.floor((scroll - (this.state.firstPageId !== 1 ? props.itemHeight : 0)) / props.itemHeight);
     var visibleEnd = Math.min(visibleStart + (itemsPerBody - 1), total - 1);
 
     var renderStart = Math.max(0, (Math.floor(visibleStart / props.itemsPerPage) * props.itemsPerPage) - props.itemsPerPage);
@@ -97,7 +95,6 @@ class Infinite extends Component {
   }
 
   render() {
-    window.props = this.props;
     if (!this.props.itemHeight) {
       console.error('itemHeight is a required prop');
       return null;
@@ -109,9 +106,8 @@ class Infinite extends Component {
     const sortedPages = sortPages(connectedPages(this.props.pages, this.props.startAtPage));
     const firstPageId = sortedPages.length > 0 ? sortedPages[0].id : null;
     const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
-    const initialFocus = (firstPageId - 1) * itemsPerPage;
 
-    const before = <div style={{height: this.props.itemHeight}}></div>;
+    const before = firstPageId !== 1 ? <div style={{height: this.props.itemHeight}}></div> : null;
     const after = <div style={{height: (this.state.items.length - this.state.renderEnd) * this.props.itemHeight}}></div>;
     const visible = [];
     for (var i = this.state.renderStart; i <= this.state.renderEnd; ++i) {
