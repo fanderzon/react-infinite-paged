@@ -19,13 +19,11 @@ class Infinite extends Component {
       scroll: 0,
     };
     this.onScroll = this.onScroll.bind(this);
+    this.onVisibleChange = this.onVisibleChange.bind(this);
   }
 
   componentDidMount() {
-    this.props.dispatch({
-      type: 'FETCH_PAGE',
-      payload: this.props.startAtPage
-    });
+    this.props.fetchPage(this.props.startAtPage);
   }
 
   componentWillReceiveProps(newProps) {
@@ -61,14 +59,10 @@ class Infinite extends Component {
 
     console.log(`render ${renderStart}-${renderEnd} visible ${visibleStart}-${visibleEnd}`);
 
-    if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart)) {
+    if ((visibleStart !== this.state.visibleStart)) {
       const scrollDirection = visibleStart > this.state.visibleStart ? 'down' : 'up';
-      this.props.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
-    } else if (this.props.onVisibleChange && (visibleStart !== this.state.visibleStart) && visibleStart < 0) {
-      // TODO: If we want a scroll up gesture, add logic here
-      console.log('possible visibility change', visibleStart);
+      this.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
     }
-
 
     this.setState({
       visibleStart: visibleStart,
@@ -83,6 +77,14 @@ class Infinite extends Component {
     this.calculatePosition(this.container.scrollTop, this.props);
   }
 
+  onVisibleChange(params) {
+    const lastPageId = this.state.pages.length > 0 ? this.state.pages[this.state.pages.length - 1].id : null;
+    if (params.end >= (this.state.items.length - 1) && this.state.items.length > 0) {
+      this.props.fetchPage(lastPageId + 1);
+    }
+
+  }
+
   render() {
     window.props = this.props;
     if (!this.props.itemHeight) {
@@ -95,15 +97,8 @@ class Infinite extends Component {
 
     const sortedPages = sortPages(connectedPages(this.props.pages, this.props.startAtPage));
     const firstPageId = sortedPages.length > 0 ? sortedPages[0].id : null;
-    const lastPageId = sortedPages.length > 0 ? sortedPages[sortedPages.length - 1].id : null;
     const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
     const initialFocus = (firstPageId - 1) * itemsPerPage;
-
-    // If first page is not 1, let's add one page worth of "padding" items before the first real item
-    const items = firstPageId === 1 ? itemsFromPages(sortedPages) : [
-      ...Array.apply(null, Array(itemsPerPage)).map((item, i) => ({ id: i - itemsPerPage, content: '😎'})),
-      ...itemsFromPages(sortedPages)
-    ];
 
     const before = <div style={{height: this.state.renderStart * this.props.itemHeight}}></div>;
     const after = <div style={{height: (this.state.items.length - this.state.renderEnd) * this.props.itemHeight}}></div>;
