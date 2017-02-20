@@ -31,12 +31,16 @@ class Infinite extends Component {
       this.setState({
         loaded: true
       },() => {
+        window.c = this.container;
         this.container.scrollTop = newProps.itemHeight;
       });
     }
+
     if (newProps.pages.length !== this.state.pages.length) {
       const pages = sortPages(connectedPages(newProps.pages, newProps.startAtPage));
       const firstPageId = pages.length > 0 ? pages[0].id : null;
+      const newFirstPage = firstPageId < this.state.firstPageId && this.state.loaded;
+
       const items = itemsFromPages(pages);
       this.setState({
         pages,
@@ -44,6 +48,9 @@ class Infinite extends Component {
         items,
       }, () => {
         this.calculatePosition(this.state.scroll, newProps);
+        if (newFirstPage) {
+          this.container.scrollTop = this.state.scroll + newProps.itemHeight * newProps.itemsPerPage;
+        }
       });
     }
   }
@@ -53,7 +60,7 @@ class Infinite extends Component {
     scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
     const itemsPerBody = Math.floor(this.props.height / this.props.itemHeight);
     const total = this.state.items.length;
-    var visibleStart = Math.floor(scroll / props.itemHeight);
+    var visibleStart = Math.floor((scroll - props.itemHeight) / props.itemHeight);
     var visibleEnd = Math.min(visibleStart + (itemsPerBody - 1), total - 1);
 
     var renderStart = Math.max(0, (Math.floor(visibleStart / props.itemsPerPage) * props.itemsPerPage) - props.itemsPerPage);
@@ -61,7 +68,7 @@ class Infinite extends Component {
 
     console.log(`render ${renderStart}-${renderEnd} visible ${visibleStart}-${visibleEnd}`);
 
-    if ((visibleStart !== this.state.visibleStart)) {
+    if ((visibleStart !== this.state.visibleStart) && this.state.loaded) {
       const scrollDirection = visibleStart > this.state.visibleStart ? 'down' : 'up';
       this.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
     }
@@ -81,7 +88,9 @@ class Infinite extends Component {
 
   onVisibleChange(params) {
     const lastPageId = this.state.pages.length > 0 ? this.state.pages[this.state.pages.length - 1].id : null;
-    if (params.end >= (this.state.items.length - 1) && this.state.items.length > 0) {
+    if (params.start < 0) {
+      this.props.fetchPage(this.state.firstPageId - 1);
+    } else if (params.end >= (this.state.items.length - 1) && this.state.items.length > 0) {
       this.props.fetchPage(lastPageId + 1);
     }
 
