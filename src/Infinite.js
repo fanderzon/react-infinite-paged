@@ -30,6 +30,8 @@ class Infinite extends Component {
     if (!this.state.loaded && newProps.pages.findIndex(i => i.id === newProps.startAtPage && i.loaded) !== -1) {
       this.setState({
         loaded: true
+      },() => {
+        this.container.scrollTop = newProps.itemHeight;
       });
     }
     if (newProps.pages.length !== this.state.pages.length) {
@@ -100,7 +102,7 @@ class Infinite extends Component {
     const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
     const initialFocus = (firstPageId - 1) * itemsPerPage;
 
-    const before = <div style={{height: this.state.renderStart * this.props.itemHeight}}></div>;
+    const before = <div style={{height: this.props.itemHeight}}></div>;
     const after = <div style={{height: (this.state.items.length - this.state.renderEnd) * this.props.itemHeight}}></div>;
     const visible = [];
     for (var i = this.state.renderStart; i <= this.state.renderEnd; ++i) {
