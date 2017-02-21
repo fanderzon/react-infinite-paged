@@ -70,8 +70,8 @@ class Infinite extends Component {
     }
 
     this.setState({
-      visibleStart: visibleStart,
-      visibleEnd: visibleEnd,
+      visibleStart,
+      visibleEnd,
       renderStart,
       renderEnd,
       scroll: scroll,
@@ -89,7 +89,6 @@ class Infinite extends Component {
     } else if (params.end >= (this.state.items.length - 1) && this.state.items.length > 0) {
       this.props.fetchPage(lastPageId + 1);
     }
-
   }
 
   render() {
@@ -101,12 +100,10 @@ class Infinite extends Component {
       return null;
     }
 
-    const sortedPages = sortPages(connectedPages(this.props.pages, this.props.startAtPage));
-    const firstPageId = sortedPages.length > 0 ? sortedPages[0].id : null;
     const itemsPerPage = this.props.itemsPerPage || DEFAULT_ITEMS_PER_PAGE;
 
-    const before = firstPageId !== 1 ? <div style={{height: this.props.itemHeight}}></div> : null;
-    const after = <div style={{height: (this.state.items.length - this.state.renderEnd) * this.props.itemHeight}}></div>;
+    const before = <div style={{height: this.state.renderStart * this.props.itemHeight}}></div>;
+    const after = <div style={{height: ((this.state.items.length-1) - this.state.renderEnd) * this.props.itemHeight}}></div>;
     const visible = [];
     for (var i = this.state.renderStart; i <= this.state.renderEnd; ++i) {
       var item = this.state.items[i];
@@ -114,10 +111,16 @@ class Infinite extends Component {
     }
 
     return (
-      <div style={{top: 0, overflowX: 'hidden', overflowY: 'auto', background: 'blue', height: this.props.height}} ref={el => this.container = el} onScroll={this.onScroll}>
+      <div style={{top: 0, overflowX: 'hidden', overflowY: 'auto', height: this.props.height}} ref={el => this.container = el} onScroll={this.onScroll}>
+      {
+        this.state.firstPageId !== 1 && (
+          <div style={{height: this.props.itemHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
+        )
+      }
         {before}
         {visible}
         {after}
+        <div style={{height: this.props.itemHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
       </div>
     );
   }
