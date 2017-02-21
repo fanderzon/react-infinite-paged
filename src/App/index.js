@@ -1,5 +1,5 @@
 import React from 'react';
-import InfinitePaged from '../InfinitePaged';
+import InfinitePaged from '../Infinite';
 
 import logo from './logo.svg';
 import './index.css';
@@ -21,11 +21,14 @@ const App = ({pages, items, dispatch}) => {
         <InfinitePaged
           height={container ? window.innerHeight - container.offsetTop : 300}
           pages={pages}
-          startAtPage={4}
-          itemHeight={170}
+          startAtPage={5}
+          itemHeight={180}
           itemsPerPage={10}
           Component={ListItem}
-          dispatch={dispatch}
+          fetchPage={payload => dispatch({
+            type: 'FETCH_PAGE',
+            payload
+          })}
         />
       </div>
       <div className="App-header">

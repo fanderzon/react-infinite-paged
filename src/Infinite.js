@@ -64,8 +64,6 @@ class Infinite extends Component {
     var renderStart = Math.max(0, (Math.floor(visibleStart / props.itemsPerPage) * props.itemsPerPage) - props.itemsPerPage);
     var renderEnd = Math.min(renderStart + (props.itemsPerPage * 3), total - 1);
 
-    console.log(`render ${renderStart}-${renderEnd} visible ${visibleStart}-${visibleEnd}`);
-
     if ((visibleStart !== this.state.visibleStart) && this.state.loaded) {
       const scrollDirection = visibleStart > this.state.visibleStart ? 'down' : 'up';
       this.onVisibleChange({start: visibleStart, end: visibleEnd, scrollDirection});
