@@ -30,7 +30,7 @@ class Infinite extends Component {
       this.setState({
         loaded: true
       },() => {
-        this.container.scrollTop = newProps.itemHeight;
+        this.container.scrollTop = newProps.loaderHeight;
       });
     }
 
@@ -38,8 +38,8 @@ class Infinite extends Component {
       const pages = sortPages(connectedPages(newProps.pages, newProps.startAtPage));
       const firstPageId = pages.length > 0 ? pages[0].id : null;
       const newFirstPage = firstPageId < this.state.firstPageId && this.state.loaded;
-
       const items = itemsFromPages(pages);
+
       this.setState({
         pages,
         firstPageId,
@@ -58,7 +58,7 @@ class Infinite extends Component {
     scroll = scroll === scroll ? scroll : 0; // eslint-disable-line no-self-compare
     const itemsPerBody = Math.floor(this.props.height / this.props.itemHeight);
     const total = this.state.items.length;
-    var visibleStart = Math.floor((scroll - (this.state.firstPageId !== 1 ? props.itemHeight : 0)) / props.itemHeight);
+    var visibleStart = Math.floor((scroll - (this.state.firstPageId !== 1 ? props.loaderHeight : 0)) / props.itemHeight);
     var visibleEnd = Math.min(visibleStart + (itemsPerBody - 1), total - 1);
 
     var renderStart = Math.max(0, (Math.floor(visibleStart / props.itemsPerPage) * props.itemsPerPage) - props.itemsPerPage);
@@ -114,13 +114,13 @@ class Infinite extends Component {
       <div style={{top: 0, overflowX: 'hidden', overflowY: 'auto', height: this.props.height}} ref={el => this.container = el} onScroll={this.onScroll}>
       {
         this.state.firstPageId !== 1 && (
-          <div style={{height: this.props.itemHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
+          <div style={{height: this.props.loaderHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
         )
       }
         {before}
         {visible}
         {after}
-        <div style={{height: this.props.itemHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
+        <div style={{height: this.props.loaderHeight, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{<this.props.Loader />}</div>
       </div>
     );
   }

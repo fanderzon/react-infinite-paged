@@ -30,6 +30,7 @@ const App = ({pages, items, dispatch}) => {
           itemsPerPage={10}
           Component={ListItem}
           Loader={Loader}
+          loaderHeight={150}
           fetchPage={payload => dispatch({
             type: 'FETCH_PAGE',
             payload
